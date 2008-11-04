@@ -8,7 +8,7 @@ PROJECT_URL         = "http://merbivore.com"
 PROJECT_SUMMARY     = "Merb plugin that provides caching (page, action, fragment, object)"
 PROJECT_DESCRIPTION = PROJECT_SUMMARY
 
-GEM_AUTHOR = "Ben Burkert"
+GEM_AUTHORS = ["Ben Burkert", "Ben Schwarz", "Daniel Neighman"]
 GEM_EMAIL  = "ben@benburkert.com"
 
 GEM_NAME    = "merb-cache"
@@ -28,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README", "LICENSE", 'TODO']
   s.summary = PROJECT_SUMMARY
   s.description = PROJECT_DESCRIPTION
-  s.author = GEM_AUTHOR
+  s.authors = GEM_AUTHORS
   s.email = GEM_EMAIL
   s.homepage = PROJECT_URL
   s.add_dependency('merb-core', ">= #{Merb::VERSION}")
