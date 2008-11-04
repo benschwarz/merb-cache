@@ -28,7 +28,7 @@ module Merb
     autoload :GzipStore,              "merb-cache" / "stores" / "strategy" / "gzip_store"
     autoload :PageStore,              "merb-cache" / "stores" / "strategy" / "page_store"
     autoload :SHA1Store,              "merb-cache" / "stores" / "strategy" / "sha1_store"
-
+    autoload :MintCacheStore,         "merb-cache" / "stores" / "strategy" / "mintcache_store"
     
     class << self
       attr_accessor :stores
