@@ -9,6 +9,9 @@ module Merb::Cache::CacheMixin
       after(:_cache_after, conditions.only(:if, :unless).merge(:with => conditions))
     end
 
+    # cache is an alias to cache_action, it will take multiple :actions 
+    # eg: cache :index, :show
+    # no options can be sent to this method
     def cache(*actions)
       if actions.last.is_a? Hash
         cache_action(*actions)
@@ -17,6 +20,9 @@ module Merb::Cache::CacheMixin
       end
     end
 
+    # cache action will perform an action_cache
+    # valid options are:
+    # :expire_in => 3600 (one hour)
     def cache_action(action, conditions = {})
       before("_cache_#{action}_before", conditions.only(:if, :unless).merge(:with => [conditions], :only => action))
       after("_cache_#{action}_after", conditions.only(:if, :unless).merge(:with => [conditions], :only => action))
@@ -62,7 +68,9 @@ module Merb::Cache::CacheMixin
 
       kontroller
     end
-
+    
+    # Builds a request that will be sent to the merb worker process to be
+    # cached without holding some poor user up generating the cache (through run_later)
     def build_request(path, params = {}, env = {})
       path, params, env = nil, path, params if path.is_a? Hash
 
@@ -74,6 +82,9 @@ module Merb::Cache::CacheMixin
     end
   end
 
+  # Partial / fragment caches are written / retrieved using fetch_partial
+  # Valid options are:
+  # :collection => @object
   def fetch_partial(template, opts={}, conditions = {})
     template_id = template.to_s
     if template_id =~ %r{^/}
