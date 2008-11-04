@@ -14,7 +14,7 @@ module Merb
         'SERVER_NAME' => 'localhost',
         'PATH_INFO' => '/',
         'HTTP_ACCEPT_ENCODING' => 'gzip,deflate',
-        'HTTP_USER_AGENT' => 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.8.0.1) Gecko/20060214 Camino/1.0',
+        'HTTP_USER_AGENT' => 'Ruby/Merb (ver: ' + Merb::VERSION + ') merb-cache',
         'SCRIPT_NAME' => '/',
         'SERVER_PROTOCOL' => 'HTTP/1.1',
         'HTTP_CACHE_CONTROL' => 'max-age=0',
