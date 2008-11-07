@@ -54,7 +54,7 @@ module Merb::Cache
     def write_mint_cache(key, data = nil, parameters = {}, conditions = {})
       expiry = (conditions[:expire_in].nil?) ? 3600 : (conditions[:expire_in] * 2)
       
-      @stores.capture_first {|c| c.write(validity_key(key), data, parameters, conditions.merge({:expire_in => expiry}))}
+      @stores.capture_first {|c| c.write(validity_key(key), (Time.now + expiry), parameters, conditions.merge({:expire_in => expiry}))}
       @stores.capture_first {|c| c.write(data_key(key), data, parameters, conditions.merge({:expire_in => expiry}))}
     end
     
