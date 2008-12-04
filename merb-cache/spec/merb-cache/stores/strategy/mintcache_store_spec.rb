@@ -11,29 +11,17 @@ describe Merb::Cache::MintCacheStore do
   
   describe "when writing a cache" do
     it "should receive write three times (key, key_validity and key_data) for write" do
-      @store.stores.first.should_receive(:write).once.with('foo', 'body', {}, {})
-      @store.stores.first.should_receive(:write).once.with('foo_validity', 'body', {}, {:expire_in => 3600})
-      @store.stores.first.should_receive(:write).once.with('foo_data', 'body', {}, {:expire_in => 3600})
-      
       @store.write('foo', 'body')
+      %w(foo foo_validity foo_data).each do |key|
+        @store.read(key).should_not be_nil
+      end
     end
     
     it "should receive write_all three times (key, key_validity and key_data for write_all" do
-      @store.stores.first.should_receive(:write_all).once.with('foo', 'body', {}, {})
-      @store.stores.first.should_receive(:write_all).once.with('foo_validity', 'body', {}, {})
-      @store.stores.first.should_receive(:write_all).once.with('foo_data', 'body', {}, {})
-      
       @store.write_all('foo', 'body')
+      %w(foo foo_validity foo_data).each do |key|
+        @store.read(key).should_not be_nil
+      end
     end
-  end
-  
-  describe "when reading a cache" do
-    it "should receive read three times (key, key_validity and key_data)" do
-      @store.stores.first.should_receive(:read).once.with('foo', {})
-      @store.stores.first.should_receive(:read).once.with('foo_validity', {})
-      @store.stores.first.should_receive(:read).once.with('foo_data', {})
-      
-      @store.read('foo')
-    end 
   end
 end
