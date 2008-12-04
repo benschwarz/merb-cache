@@ -60,9 +60,12 @@ class DummyStore < Merb::Cache::AbstractStore
   def fetch(key, parameters = {}, conditions = {}, &blk)
     @@vault[[key, parameters]] ||= blk.call
   end
-
+  
   def exists?(key, parameters = {})
-    @@vault.has_key? [key, parameters]
+    if @@vault.has_key?(key)
+      return true if @@vault[key].find {|data, timestamp, conditions, params| params == parameters}
+    end
+    return false
   end
 
   def delete(key, parameters = {})
