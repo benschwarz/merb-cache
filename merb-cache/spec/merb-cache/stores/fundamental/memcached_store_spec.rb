@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/abstract_store_spec'
 
 begin
   require 'memcached'
-  servers = ['127.0.0.1:43042', '127.0.0.1:43043']
+  servers = '127.0.0.1:11211'
   namespace = 'memcached_test_namespace'
   
   options = {      
@@ -17,14 +17,14 @@ begin
   raise Exception unless cache.get(key) == value
 rescue Exception => e
   puts e.message
-  puts "Memcached connection failed.  Try starting memcached with the memcached:start rake task or installing memcached gem with sudo gem install memcached."
+  puts "Memcached connection failed.  Try starting memcached on the default port (11211)"
 else
 
   describe Merb::Cache::MemcachedStore do
     it_should_behave_like 'all stores'
 
     before(:each) do
-      @store = Merb::Cache::MemcachedStore.new(:namespace => "specs", :servers => ["127.0.0.1:43042", "127.0.0.1:43043"])
+      @store = Merb::Cache::MemcachedStore.new(:namespace => "specs", :servers => ["127.0.0.1:11211"])
       @memcached = @store.memcached
       @memcached.flush
     end
@@ -39,7 +39,7 @@ else
     end
 
     it "has accessor for servers" do
-      @store.servers.should == ["127.0.0.1:43042", "127.0.0.1:43043"]
+      @store.servers.should == ["127.0.0.1:11211"]
     end
   
     it "has accessor for memcached connector" do
@@ -183,9 +183,9 @@ else
 
         @store.delete_all
       
-        @store.exists?("ruby").should be_nil
-        @store.exists?("python").should be_nil
-        @store.exists?("perl").should be_nil           
+        @store.exists?("ruby").should be_false
+        @store.exists?("python").should be_false
+        @store.exists?("perl").should be_false
       end
     end
 
