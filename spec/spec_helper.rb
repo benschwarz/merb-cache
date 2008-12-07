@@ -19,6 +19,8 @@ Spec::Runner.configure do |config|
   config.include Merb::Test::RouteHelper
 end
 
+# Usage
+# http://github.com/hassox/merb/tree/authz/merb-core/spec/public/authorization/base_spec.rb
 class Viking
   def self.captures
     @captures ||= []
