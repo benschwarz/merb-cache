@@ -9,7 +9,6 @@ PROJECT_SUMMARY     = "Merb plugin that provides caching (page, action, fragment
 PROJECT_DESCRIPTION = PROJECT_SUMMARY
 
 GEM_AUTHORS = ["Ben Burkert", "Ben Schwarz", "Daniel Neighman"]
-GEM_EMAIL  = "ben@benburkert.com"
 
 GEM_NAME    = "merb-cache"
 PKG_BUILD   = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
@@ -29,7 +28,6 @@ spec = Gem::Specification.new do |s|
   s.summary = PROJECT_SUMMARY
   s.description = PROJECT_DESCRIPTION
   s.authors = GEM_AUTHORS
-  s.email = GEM_EMAIL
   s.homepage = PROJECT_URL
   s.add_dependency('merb-core', ">= #{Merb::VERSION}")
   s.require_path = 'lib'
