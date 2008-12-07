@@ -49,7 +49,7 @@ module Merb::Cache
       read(key, parameters) || (writable?(key, parameters, conditions) && write(key, value = blk.call, parameters, conditions) && value)
     end
 
-    # returns true/false/nil based on if data identified by the key & parameters
+    # returns true/false based on if data identified by the key & parameters
     # is persisted in the store.
     #
     # With Memcached 1.2 protocol the only way to
@@ -57,11 +57,9 @@ module Merb::Cache
     # It is very fast and shouldn't be a concern.
     def exists?(key, parameters = {})
       begin
-        @memcached.get(normalize(key, parameters)) && true
-      rescue  Memcached::Stored
-        true
+        true if @memcached.get(normalize(key, parameters))
       rescue Memcached::NotFound
-        nil
+        false
       end
     end
 

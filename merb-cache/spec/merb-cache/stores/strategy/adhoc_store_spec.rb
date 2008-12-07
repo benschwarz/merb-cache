@@ -174,7 +174,7 @@ describe Merb::Cache::AdhocStore do
 
       adhoc = Merb::Cache::AdhocStore.new
       adhoc.stores = [unreadable, unreadable, unreadable]
-      adhoc.exists?(:foo).should be_nil
+      adhoc.exists?(:foo).should be_false
     end
   end
 

@@ -13,12 +13,12 @@ describe Merb::Cache::AbstractStrategyStore do
 
     describe "contextualizing method", :shared => true do
       it "should return a subclass of itself" do
-        subclass = @klass.contextualize(Class.new(Merb::Cache::AbstractStore))
+        subclass = @klass.[](Class.new(Merb::Cache::AbstractStore))
         subclass.superclass.should  == @klass
       end
 
       it "should set the contextualized_stores attributes" do
-        subclass = @klass.contextualize(context_class = Class.new(Merb::Cache::AbstractStore))
+        subclass = @klass.[](context_class = Class.new(Merb::Cache::AbstractStore))
         subclass.contextualized_stores.first.should == context_class
       end
     end
@@ -33,14 +33,14 @@ describe Merb::Cache::AbstractStrategyStore do
 
     describe "#initialize" do
       it "should create an instance of the any context classes" do
-        subclass = @klass.contextualize(context_class = Class.new(Merb::Cache::AbstractStore))
+        subclass = @klass.[](context_class = Class.new(Merb::Cache::AbstractStore))
         instance = subclass.new({})
         instance.stores.first.class.superclass.should == Merb::Cache::AbstractStore
       end
 
       it "should lookup the instance of any context names" do
         Merb::Cache.register(:foo, Class.new(Merb::Cache::AbstractStore))
-        subclass = @klass.contextualize(:foo)
+        subclass = @klass.[](:foo)
         Merb::Cache.should_receive(:[]).with(:foo)
         subclass.new({})
       end
@@ -48,7 +48,7 @@ describe Merb::Cache::AbstractStrategyStore do
 
     describe "#clone" do
       it "should clone each context instance" do
-        subclass = @klass.contextualize(context_class = Class.new(Merb::Cache::AbstractStore))
+        subclass = @klass.[](context_class = Class.new(Merb::Cache::AbstractStore))
         instance = mock(:instance)
         context_class.should_receive(:new).and_return(instance)
         instance.should_receive(:clone)

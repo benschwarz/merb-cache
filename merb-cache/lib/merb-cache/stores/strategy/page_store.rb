@@ -18,7 +18,9 @@ module Merb::Cache
 
     def write(dispatch, data = nil, parameters = {}, conditions = {})
       if writable?(dispatch, parameters, conditions)
-        @stores.capture_first {|s| s.write(normalize(dispatch), data || dispatch.body, {}, conditions)}
+        return @stores.capture_first {|s| s.write(normalize(dispatch), data || dispatch.body, {}, conditions)}
+      else
+        return false
       end
     end
 
@@ -36,7 +38,9 @@ module Merb::Cache
 
     def exists?(dispatch, parameters = {})
       if writable?(dispatch, parameters)
-        @stores.capture_first {|s| s.exists?(normalize(dispatch), {})}
+        return @stores.any? {|s| s.exists?(normalize(dispatch), {})}
+      else
+        return false
       end
     end
 

@@ -51,7 +51,7 @@ module Merb::Cache
     # returns true/false/nil based on if data identified by the key & parameters
     # is persisted in the store.
     def exists?(key, parameters = {})
-      @stores.capture_first {|s| s.exists?(key, parameters)}
+      @stores.any? {|s| s.exists?(key, parameters)}
     end
 
     # deletes the entry for the key & parameter from the store.

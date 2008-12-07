@@ -10,10 +10,8 @@ describe Merb::Cache::SHA1Store do
   end
 
   describe "#writable?" do
-    it "should be true if the key is a string, symbol, or number" do
-      @store.writable?(:foo).should be_true
+    it "should return true" do
       @store.writable?('foo').should be_true
-      @store.writable?(123).should be_true
     end
 
     it "should be false if none of the context caches are writable" do

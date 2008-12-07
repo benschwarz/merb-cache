@@ -61,7 +61,7 @@ class Merb::Cache::AbstractStore
     raise NotImplementedError
   end
 
-  # returns true/false/nil based on if data identified by the key & parameters
+  # returns true/false based on if data identified by the key & parameters
   # is persisted in the store.
   #
   # @param [#to_s] key the key used to identify an entry

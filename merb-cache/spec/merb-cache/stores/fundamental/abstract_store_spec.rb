@@ -16,14 +16,6 @@ describe 'all stores', :shared => true do
       lambda { @store.read('foo') }.should_not raise_error(NotImplementedError)
     end
 
-    it "should accept a string key" do
-      @store.read('foo')
-    end
-
-    it "should accept a symbol key" do
-      @store.read(:foo)
-    end
-
     it "should accept a parameters hash" do
       @store.read('foo', :params => :hash)
     end
@@ -34,30 +26,14 @@ describe 'all stores', :shared => true do
       lambda { @store.write('foo', 'bar') }.should_not raise_error(NotImplementedError)
     end
 
-    it "should accept a string key" do
-      @store.write('foo', 'bar')
-    end
-
-    it "should accept a symbol as a key" do
-      @store.write(:foo, :bar)
-    end
-
-    it "should accept parameters and conditions" do
-      @store.write('foo', 'bar', {:params => :hash}, :conditions => :hash)
+    it "should return true" do
+      @store.write('foo', 'bar', {:params => :hash}, :conditions => :hash).should be_true
     end
   end
 
   describe "#fetch" do
     it "should not raise a NotImplementedError error" do
       lambda { @store.fetch('foo') {'bar'} }.should_not raise_error(NotImplementedError)
-    end
-
-    it "should accept a string key" do
-      @store.fetch('foo') { 'bar' }
-    end
-
-    it "should accept a symbol as a key" do
-      @store.fetch(:foo) { :bar }
     end
 
     it "should accept parameters and conditions" do
@@ -77,31 +53,16 @@ describe 'all stores', :shared => true do
     it "should not raise a NotImplementedError error" do
       lambda { @store.exists?('foo') }.should_not raise_error(NotImplementedError)
     end
-
-    it "should accept a string key" do
-      @store.exists?('foo')
-    end
-
-    it "should accept a symbol as a key" do
-      @store.exists?(:foo)
-    end
-
-    it "should accept parameters" do
-      @store.exists?('foo', :params => :hash)
+    
+    it "should return a boolean" do
+      @store.write('foo', 'bar')
+      @store.exists?('foo').should be_true
     end
   end
 
   describe "#delete" do
     it "should not raise a NotImplementedError error" do
       lambda { @store.delete('foo') }.should_not raise_error(NotImplementedError)
-    end
-
-    it "should accept a string key" do
-      @store.delete('foo')
-    end
-
-    it "should accept a symbol as a key" do
-      @store.delete(:foo)
     end
 
     it "should accept a parameters hash" do

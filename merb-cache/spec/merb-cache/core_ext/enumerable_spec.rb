@@ -18,5 +18,9 @@ describe Enumerable do
         end
       }.should_not raise_error
     end
+    
+    it "should return the first item 'captured'" do
+      [1, 2, 3].capture_first{|i| i }.should == 1
+    end
   end
 end

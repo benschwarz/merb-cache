@@ -56,7 +56,7 @@ describe Merb::Cache::ActionStore do
     it "should not store to the context cache if the dispatch is not storable" do
       @dummy.should_not_receive(:write)
 
-      @store.write(:foo).should be_nil
+      @store.write(:foo).should be_false
     end
 
     it "should use the controller instance's body as the data" do
@@ -76,7 +76,7 @@ describe Merb::Cache::ActionStore do
     it "should not store to the context cache if the dispatch is not storable" do
       @dummy.should_not_receive(:write_all)
 
-      @store.write_all(:foo).should be_nil
+      @store.write_all(:foo).should be_false
     end
 
     it "should use the controller instance's body as the data" do

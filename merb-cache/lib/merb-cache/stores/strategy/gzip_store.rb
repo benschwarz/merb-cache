@@ -33,7 +33,7 @@ module Merb::Cache
     end
 
     def exists?(key, parameters = {})
-      @stores.capture_first {|c| c.exists?(key, parameters)}
+      @stores.any? {|c| c.exists?(key, parameters)}
     end
 
     def delete(key, parameters = {})

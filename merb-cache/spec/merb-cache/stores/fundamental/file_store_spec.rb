@@ -25,6 +25,10 @@ describe Merb::Cache::FileStore do
         @store.writable?('foo', {}, :expire_in => 10).should be_false
       end
     end
+    
+    it "should return a boolean" do
+      @store.writable?(:foo, {}).should be_true
+    end
   end
 
   #
