@@ -9,6 +9,17 @@ describe Merb::Cache::MintCacheStore do
     @store = Merb::Cache::MintCacheStore[DummyStore].new
   end
   
+  describe "reading caches" do
+    it "should return data after the first level cache has expired"
+  end
+  
+  describe "knowing if a cache exists" do
+    it "should return a boolean" do
+      @store.write('foo', 'bar')
+      @store.exists?('foo').should be_true
+    end
+  end
+  
   describe "when writing a cache" do
     it "should write" do
       @store.write('foo', 'bar').should be_true
@@ -43,4 +54,6 @@ describe Merb::Cache::MintCacheStore do
       end
     end
   end
+  
+  
 end

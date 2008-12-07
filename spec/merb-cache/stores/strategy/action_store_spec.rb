@@ -89,7 +89,14 @@ describe Merb::Cache::ActionStore do
       @store.write_all(@controller)
     end
   end
-
+  
+  describe "#exists?" do
+    it "should return a boolean" do
+      @store.write(@controller)
+      @store.exists?(@controller).should be_true
+    end
+  end
+  
   describe "examples" do
     class MLBSchedule < Merb::Controller
       cache :index

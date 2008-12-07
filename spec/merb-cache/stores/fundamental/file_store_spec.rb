@@ -139,6 +139,17 @@ describe Merb::Cache::FileStore do
   end
 
   #
+  # ==== # exists?
+  #
+  
+  describe "#exists?" do
+    it "should return a boolean" do
+      @store.write('foo', 'bar')
+      @store.exists?('foo').should be_true
+    end
+  end
+
+  #
   # ==== #delete
   #
 

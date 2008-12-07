@@ -31,6 +31,13 @@ describe Merb::Cache::GzipStore do
     end
   end
 
+  describe "#exists?" do
+    it "should return a boolean" do
+      @store.write('foo', 'bar')
+      @store.exists?('foo').should be_true
+    end
+  end
+
   describe "#write" do
     it "should write" do
       @store.write(:foo, "bar").should be_true

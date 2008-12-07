@@ -34,6 +34,13 @@ describe Merb::Cache::SHA1Store do
       @store.read(:foo).should == :bar
     end
   end
+  
+  describe "#exists?" do
+    it "should return a boolean" do
+      @store.write('foo', 'bar')
+      @store.exists?('foo').should be_true
+    end
+  end
 
   describe "#write" do
     it "should write" do

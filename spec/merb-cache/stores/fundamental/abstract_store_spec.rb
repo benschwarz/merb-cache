@@ -49,11 +49,6 @@ describe 'all stores', :shared => true do
     it "should not raise a NotImplementedError error" do
       lambda { @store.exists?('foo') }.should_not raise_error(NotImplementedError)
     end
-    
-    it "should return a boolean" do
-      @store.write('foo', 'bar')
-      @store.exists?('foo').should be_true
-    end
   end
 
   describe "#delete" do
