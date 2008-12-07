@@ -1,8 +1,11 @@
 module Merb::Cache
   # Store well suited for action caching.
   class ActionStore < AbstractStrategyStore
-    def writable?(dispatch, parameters = {}, conditions = {})
-      @stores.any?{|s| s.writable?(normalize(dispatch), parameters, conditions)}
+    # If you're not sending a controller dispatch, then we
+    # can't really write a cache
+    def writable?(dispatch, parameters = {}, conditions = {})      
+      return @stores.any?{|s| s.writable?(normalize(dispatch), parameters, conditions)} if dispatch.is_a? Merb::Controller
+      return false
     end
 
     def read(dispatch, parameters = {})
@@ -12,17 +15,17 @@ module Merb::Cache
     end
 
     def write(dispatch, data = nil, parameters = {}, conditions = {})
-      if writable?(dispatch, parameters, conditions)
-        return @stores.capture_first {|s| s.write(normalize(dispatch), data || dispatch.body, parameters, conditions)}
+      if writable?(dispatch, parameters)
+        return @stores.capture_first {|s| s.write(normalize(dispatch), (data || dispatch.body), parameters, conditions)}
+      else
+        return false
       end
-      
-      return false
     end
 
     def write_all(dispatch, data = nil, parameters = {}, conditions = {})
       if writable?(dispatch, parameters, conditions)
         return @stores.map {|s| s.write_all(normalize(dispatch), data || dispatch.body, parameters, conditions)}.all?
-      else
+      else 
         return false
       end
     end

@@ -25,10 +25,6 @@ describe 'all stores', :shared => true do
     it "should not raise a NotImplementedError error" do
       lambda { @store.write('foo', 'bar') }.should_not raise_error(NotImplementedError)
     end
-
-    it "should return true" do
-      @store.write('foo', 'bar', {:params => :hash}, :conditions => :hash).should be_true
-    end
   end
 
   describe "#fetch" do

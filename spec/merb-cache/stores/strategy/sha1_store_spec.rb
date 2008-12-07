@@ -36,6 +36,10 @@ describe Merb::Cache::SHA1Store do
   end
 
   describe "#write" do
+    it "should write" do
+      @store.write('foo', 'bar').should be_true
+    end
+    
     it "should pass the hashed key to the context store" do
       @store.stores.first.should_receive(:write).with(@store.digest(:foo), 'body', {}, {}).and_return true
 

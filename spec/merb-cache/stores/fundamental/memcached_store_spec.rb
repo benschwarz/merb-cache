@@ -89,6 +89,10 @@ else
     #
 
     describe "#write" do
+      it "should write" do
+        @store.write('foo', 'bar', {:params => :hash}, :conditions => :hash).should be_true
+      end
+      
       describe "when entry with the same key does not exist" do
         it "create a new entry" do
           key, data = "foo", "bar"

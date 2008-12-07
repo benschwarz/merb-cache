@@ -56,6 +56,13 @@ describe Merb::Cache::AbstractStrategyStore do
         subclass.new.clone
       end
     end
+    
+    describe "#write" do
+      it "should write" do
+        pending
+        @store.write('foo', 'bar', {:params => :hash}, :conditions => :hash).should be_true
+      end
+    end
 
     describe "#write_all" do
       it "should not raise a NotImplementedError error" do

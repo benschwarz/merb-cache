@@ -64,6 +64,10 @@ describe Merb::Cache::FileStore do
   #
 
   describe "#write" do
+    it "should write" do
+      @store.write('foo', 'bar', {:params => :hash}, :conditions => :hash).should be_true
+    end
+    
     describe "if it does not exist" do
       it "create the file" do
         key = "body.txt"

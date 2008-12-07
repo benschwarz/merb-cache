@@ -10,6 +10,10 @@ describe Merb::Cache::MintCacheStore do
   end
   
   describe "when writing a cache" do
+    it "should write" do
+      @store.write('foo', 'bar').should be_true
+    end
+    
     it "should write three keys" do
       @store.write('foo', 'body')
       %w(foo foo_validity foo_data).each do |key|

@@ -21,7 +21,7 @@ describe Merb::Cache::ActionStore do
     @controller.stub!(:action_name).and_return :action
     @controller.stub!(:body).and_return 'body'
   end
-
+  
   describe "#writable?" do
     it "should be false if the key argument is not an instance of a controller" do
       @store.writable?(:foo).should be_false
@@ -63,6 +63,10 @@ describe Merb::Cache::ActionStore do
       @controller.should_receive(:body)
 
       @store.write(@controller)
+    end
+    
+    it "should write" do
+      @store.write(@controller).should be_true
     end
   end
 

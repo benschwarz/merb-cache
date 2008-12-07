@@ -53,6 +53,8 @@ describe Merb::Cache::AdhocStore do
   end
 
   describe "#write" do
+    it "should write"
+    
     it "should return the first non-nil result of a writeable store" do
       unwritable, writable = mock(:unwritable_store), mock(:writable_store)
       unwritable.should_receive(:write).and_return nil
