@@ -19,6 +19,16 @@ Spec::Runner.configure do |config|
   config.include Merb::Test::RouteHelper
 end
 
+class Viking
+  def self.captures
+    @captures ||= []
+  end
+  
+  def self.capture(obj)
+    captures << obj
+  end
+end
+
 class DummyStore < Merb::Cache::AbstractStore
   cattr_accessor :vault
   attr_accessor  :options
