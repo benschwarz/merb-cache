@@ -1,10 +1,3 @@
-require File.expand_path(File.join(File.dirname(__FILE__), "..", "rake_helpers"))
-
-##############################################################################
-# Package && release
-##############################################################################
-RUBY_FORGE_PROJECT  = "merb"
-PROJECT_URL         = "http://merbivore.com"
 PROJECT_SUMMARY     = "Merb plugin that provides caching (page, action, fragment, object)"
 PROJECT_DESCRIPTION = PROJECT_SUMMARY
 
@@ -12,14 +5,9 @@ GEM_AUTHORS = ["Ben Burkert", "Ben Schwarz", "Daniel Neighman"]
 
 GEM_NAME    = "merb-cache"
 PKG_BUILD   = ENV['PKG_BUILD'] ? '.' + ENV['PKG_BUILD'] : ''
-GEM_VERSION = Merb::VERSION + PKG_BUILD
-
-RELEASE_NAME    = "REL #{GEM_VERSION}"
-
-require "extlib/tasks/release"
+GEM_VERSION = "1.0.0"
 
 spec = Gem::Specification.new do |s|
-  s.rubyforge_project = RUBY_FORGE_PROJECT
   s.name = GEM_NAME
   s.version = GEM_VERSION
   s.platform = Gem::Platform::RUBY
@@ -28,32 +16,13 @@ spec = Gem::Specification.new do |s|
   s.summary = PROJECT_SUMMARY
   s.description = PROJECT_DESCRIPTION
   s.authors = GEM_AUTHORS
-  s.homepage = PROJECT_URL
-  s.add_dependency('merb-core', ">= #{Merb::VERSION}")
+  s.add_dependency('merb-core', ">= 1.0")
   s.require_path = 'lib'
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec}/**/*")
 end
 
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
-end
-
-desc "Install the gem"
-task :install do
-  Merb::RakeHelper.install(GEM_NAME, :version => GEM_VERSION)
-end
-
-desc "Uninstall the gem"
-task :uninstall do
-  Merb::RakeHelper.uninstall(GEM_NAME, :version => GEM_VERSION)
-end
-
-desc "Create a gemspec file"
-task :gemspec do
-  File.open("#{GEM_NAME}.gemspec", "w") do |file|
-    file.puts spec.to_ruby
-  end
-end
+require 'rake'
+require 'spec/rake/spectask'
 
 desc "Run all examples (or a specific spec with TASK=xxxx)"
 Spec::Rake::SpecTask.new('spec') do |t|
