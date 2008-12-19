@@ -32,8 +32,9 @@ describe Merb::Cache::PageStore do
       cache :index, :show
       cache :overview
 
-      eager_cache(:index, :overview) {|c| c.request.env['REQUEST_PATH'] = c.url(:overview)}
+      eager_cache :index, :overview, :uri => '/overview'
       eager_cache :overview, :index
+      eager_cache(:overview, :show) {|params, env| build_request(build_url(:show, :team => 1), :team => 1) }
 
       def index
         "NHLScores index"
@@ -99,7 +100,19 @@ describe Merb::Cache::PageStore do
     it "should not cache a POST request" do
       dispatch(url(:index), "REQUEST_METHOD" => "POST")
 
-      @dummy.vault.should be_empty
+      @dummy.data('/index.html').should be_nil
+    end
+    
+    it "should eager cache overview after a POST request to index" do
+      dispatch(url(:index), "REQUEST_METHOD" => "POST")
+      
+      @dummy.data('/overview.html').should == "NHLScores overview"
+    end
+
+    it "should eager cache show after a request to overview" do
+      dispatch(url(:overview))
+      
+      @dummy.data('/show/1.html').should == "NHLScores show(1)"
     end
 
     it "should not eager cache during an eager cache, causing an infinit loop of eagerness" do

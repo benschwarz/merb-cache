@@ -43,7 +43,7 @@ module Merb::Cache::Controller
     # Dispatches eager caches to a worker process
     def eager_dispatch(action, params = {}, env = {}, blk = nil)
       kontroller = if blk.nil?
-        new(Merb::Request.new(env))
+        new(build_request({}, env))
       else
         result = case blk.arity
           when 0  then  blk[]
@@ -52,8 +52,8 @@ module Merb::Cache::Controller
         end
 
         case result
-        when NilClass         then new(Merb::Request.new(env))
-        when Hash, Mash       then new(Merb::Request.new(result))
+        when NilClass         then new(build_request({}, env))
+        when Hash, Mash       then new(build_request({}, result))
         when Merb::Request    then new(result)
         when Merb::Controller then result
         else raise ArgumentError, "Block to eager_cache must return nil, the env Hash, a Request object, or a Controller object"
@@ -71,6 +71,7 @@ module Merb::Cache::Controller
     # cached without holding some poor user up generating the cache (through run_later)
     def build_request(path, params = {}, env = {})
       path, params, env = nil, path, params if path.is_a? Hash
+      path ||= env.delete(:uri)
 
       Merb::Cache::CacheRequest.new(path, params, env)
     end

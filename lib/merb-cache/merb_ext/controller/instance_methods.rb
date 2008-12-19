@@ -55,7 +55,10 @@ module Merb::Cache::Controller
     def _eager_cache_after(klass, action, conditions = {}, blk = nil)
       unless @skip_cache
         run_later do
-          controller = klass.eager_dispatch(action, request.params.dup, request.env.dup, blk)
+          env = request.env.dup
+          env.merge!(conditions.only(:method, :uri))
+
+          controller = klass.eager_dispatch(action, request.params.dup, env, blk)
 
           Merb::Cache[controller._lookup_store(conditions)].write(controller, nil, *controller._parameters_and_conditions(conditions))
         end
@@ -71,7 +74,9 @@ module Merb::Cache::Controller
         end
 
         run_later do
-          controller = klass.eager_dispatch(action, params.dup, env.dup, blk)
+          env = request.env.dup
+          env.merge!(conditions.only(:method, :uri))
+          controller = klass.eager_dispatch(action, params.dup, env, blk)
         end
       end
     end
@@ -113,7 +118,7 @@ module Merb::Cache::Controller
         end
       end
 
-      return parameters, conditions.except(:params, :store, :stores)
+      return parameters, conditions.except(:params, :store, :stores, :method, :uri)
     end
   end
 end
