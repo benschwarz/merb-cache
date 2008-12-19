@@ -13,10 +13,12 @@ module Merb::Cache::Controller
       end
 
       unused, template_key = _template_for(template_id, opts.delete(:format) || content_type, kontroller, template_path)
+      template_key.gsub!(File.expand_path(Merb.root),'')
 
       fetch_proc = lambda { partial(template, opts) }
+      params_for_cache = opts.delete(:params_for_cache) || opts.dup
 
-      concat(Merb::Cache[_lookup_store(conditions)].fetch(template_key, opts, conditions, &fetch_proc), fetch_proc.binding)
+      concat(Merb::Cache[_lookup_store(conditions)].fetch(template_key, params_for_cache, conditions, &fetch_proc), fetch_proc.binding)
     end
 
     def fetch_fragment(opts = {}, conditions = {}, &proc)
