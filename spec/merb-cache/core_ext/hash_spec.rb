@@ -9,12 +9,43 @@ describe Hash do
     
     it{@params.should respond_to(:to_sha2)}
     
+    # This sec only has meaning in ruby 1.9 that uses an ordered hash
     it "should encode the hash by alphabetic key" do
-      string = ""
-      @params.keys.sort_by{|k| k.to_s}.each{|k| string << @params[k].to_s}
-      digest = Digest::SHA2.hexdigest(string)    
-      @params.to_sha2.should == digest      
-    end  
+      x = @params.to_sha2
+      y = {:id => 1, :symbol => :symbol, :string => "string"}.to_sha2
+      x.should == y
+    end
+    
+    it "should not have any collisions between different values (using arrays)" do
+      x = {'test' => ['at','vc'], 'test2' => 'b'}.to_sha2
+      y = {'test' => ['atv', 'c'], 'test2' => 'b'}.to_sha2
+      puts x != y
+      x.should_not == y
+    end
+    
+    it "should encode the keys" do
+      x = {'key' => [1,2,3]}.to_sha2
+      y = {'test' => [1,2,3]}.to_sha2
+      x.should_not == y
+    end
+    
+    it "should not make a distinction between symbol and strings for keys" do
+      x = {:key => 1}.to_sha2
+      y = {'key' => 1}.to_sha2
+      x.should == y
+    end
+    
+    it "should not have any collisions between keys and values" do
+      x = {'key' => 'ab'}.to_sha2
+      y = {'keya' => 'b'}.to_sha2
+      x.should_not == y
+    end
+    
+    it "should not have any collisions between the values of two different keys" do
+      x = {'a' => 'abc', 'b' => 'def'}.to_sha2
+      y = {'a' => 'abcd', 'b' => 'ef'}.to_sha2
+      x.should_not == y
+    end
   end
   
 end
