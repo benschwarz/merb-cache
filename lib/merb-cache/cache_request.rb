@@ -5,18 +5,20 @@ module Merb
       attr_accessor :params
 
       def initialize(uri = "", params = {}, env = {})
-        uri = URI(uri || '/')
+        if uri || !env[Merb::Const::REQUEST_URI]
+          uri = URI(uri || '/')        
+          env[Merb::Const::REQUEST_URI]  = uri.respond_to?(:request_uri) ? uri.request_uri : uri.to_s
+          env[Merb::Const::HTTP_HOST]    = uri.host + (uri.port != 80 ? ":#{uri.port}" : '') if uri.host
+          env[Merb::Const::SERVER_PORT]  = uri.port.to_s   if uri.port
+          env[Merb::Const::QUERY_STRING] = uri.query.to_s  if uri.query
+          env[Merb::Const::REQUEST_PATH] = env[Merb::Const::PATH_INFO] = uri.path
+        end
         
-        env[Merb::Const::REQUEST_URI]  = uri.respond_to?(:request_uri) ? uri.request_uri : uri.to_s
-        env[Merb::Const::HTTP_HOST]    = uri.host + (uri.port != 80 ? ":#{uri.port}" : '') if uri.host
-        env[Merb::Const::SERVER_PORT]  = uri.port.to_s   if uri.port
-        env[Merb::Const::QUERY_STRING] = uri.query.to_s  if uri.query
-        
-        env[Merb::Const::REQUEST_METHOD] = env.delete(:method).to_s.upcase if env[:method]
+        env[Merb::Const::REQUEST_METHOD] = env[:method] ? env.delete(:method).to_s.upcase : 'GET'
         
         super(DEFAULT_ENV.merge(env))
         
-        self.env[Merb::Const::REQUEST_PATH] = self.env[Merb::Const::PATH_INFO] = self.path
+       
         @params = params
       end
 

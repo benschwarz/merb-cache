@@ -68,6 +68,10 @@ describe Merb::Cache::CacheRequest do
     (request.env[Merb::Const::REQUEST_URI] == request.uri).should be_true
   end
 
+  it "should not setup the uri if no uri is provided and env[Merb::Const::REQUEST_URI] is not nil" do
+    Merb::Cache::CacheRequest.new(nil, {}, {Merb::Const::REQUEST_URI => '/test'}).uri.should == '/test'
+  end
+
   it "should setup a default env" do
     Merb::Cache::CacheRequest.new('').env.should_not be_empty
   end
