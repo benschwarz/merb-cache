@@ -2,17 +2,26 @@ module Merb
   module Cache
     class CacheRequest < Merb::Request
       
-      attr_accessor :path, :params
+      attr_accessor :params
 
-      def initialize(path, params = {}, env = {})
+      def initialize(uri = "", params = {}, env = {})
+        uri = URI(uri || '/')
+        
+        env[Merb::Const::REQUEST_URI]  = uri.respond_to?(:request_uri) ? uri.request_uri : uri.to_s
+        env[Merb::Const::HTTP_HOST]    = uri.host + (uri.port != 80 ? ":#{uri.port}" : '') if uri.host
+        env[Merb::Const::SERVER_PORT]  = uri.port.to_s   if uri.port
+        env[Merb::Const::QUERY_STRING] = uri.query.to_s  if uri.query
+        
+        env[Merb::Const::REQUEST_METHOD] = params.delete(:method).to_s.upcase if params[:method]
+        
         super(DEFAULT_ENV.merge(env))
-
-        @path, @params = path, params
+        
+        self.env[Merb::Const::REQUEST_PATH] = self.env[Merb::Const::PATH_INFO] = self.path
+        @params = params
       end
 
       DEFAULT_ENV = Mash.new({
         'SERVER_NAME' => 'localhost',
-        'PATH_INFO' => '/',
         'HTTP_ACCEPT_ENCODING' => 'gzip,deflate',
         'HTTP_USER_AGENT' => 'Ruby/Merb (ver: ' + Merb::VERSION + ') merb-cache',
         'SCRIPT_NAME' => '/',
@@ -26,12 +35,11 @@ module Merb
         'HTTP_REFERER' => 'http://localhost/',
         'HTTP_ACCEPT_CHARSET' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
         'HTTP_VERSION' => 'HTTP/1.1',
-        'REQUEST_URI' => '/',
+        'REQUEST_METHOD' => 'GET',
         'SERVER_PORT' => '80',
         'GATEWAY_INTERFACE' => 'CGI/1.2',
         'HTTP_ACCEPT' => 'text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
-        'HTTP_CONNECTION' => 'keep-alive',
-        'REQUEST_METHOD' => 'GET'
+        'HTTP_CONNECTION' => 'keep-alive'
       }) unless defined?(DEFAULT_ENV)
     end
   end
