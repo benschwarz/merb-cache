@@ -29,7 +29,7 @@ describe Merb::Cache::CacheRequest do
     end
     
     it "should be set by the :method parameter" do
-      Merb::Cache::CacheRequest.new('/test?q=1', :method => :put).method.should == :put
+      Merb::Cache::CacheRequest.new('/test?q=1', {}, :method => :put).method.should == :put
     end
   end
 

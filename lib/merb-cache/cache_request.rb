@@ -12,7 +12,7 @@ module Merb
         env[Merb::Const::SERVER_PORT]  = uri.port.to_s   if uri.port
         env[Merb::Const::QUERY_STRING] = uri.query.to_s  if uri.query
         
-        env[Merb::Const::REQUEST_METHOD] = params.delete(:method).to_s.upcase if params[:method]
+        env[Merb::Const::REQUEST_METHOD] = env.delete(:method).to_s.upcase if env[:method]
         
         super(DEFAULT_ENV.merge(env))
         
