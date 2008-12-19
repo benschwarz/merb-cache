@@ -5,17 +5,13 @@ module Merb::Cache::Controller
       after(:_cache_after, conditions.only(:if, :unless).merge(:with => conditions))
     end
 
-    # cache is an alias to cache_action, it will take multiple :actions 
-    # eg: cache :index, :show
-    # no options can be sent to this method
+    # cache is an alias to cache_action, it will take multiple :actions and pass the conditions hash for each action
+    # eg: cache :index, :show, :expire_in => 30, :store => :action_store
     def cache(*actions)
-      if actions.last.is_a? Hash
-        cache_action(*actions)
-      else
-        actions.each {|a| cache_action(*a)}
-      end
+      options = extract_options_from_args!(actions) || {}
+      actions.each {|a| cache_action(a, options)}
     end
-
+    
     # cache action will perform an action_cache
     # valid options are:
     # :expire_in => 3600 (one hour)
