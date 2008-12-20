@@ -34,6 +34,11 @@ module Merb::Cache::Controller
       controller, conditions = _controller_and_conditions(action, params)
       Merb::Cache[controller._lookup_store(conditions)].writable?(controller, *controller._parameters_and_conditions(conditions))
     end
+    
+    def cached?(action, params = {})
+      controller, conditions = _controller_and_conditions(action, params)
+      Merb::Cache[controller._lookup_store(conditions)].exists?(controller, *controller._parameters_and_conditions(conditions))
+    end
   
     def cache_for(action, params = {})
       controller, conditions = _controller_and_conditions(action, params)
