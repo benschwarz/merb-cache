@@ -1,5 +1,11 @@
 module Merb::Cache::Controller
   module ClassMethods
+    def self.extended(base)
+      base.send :class_inheritable_accessor, :_cache
+      base._cache = {}
+    end
+    
+    
     def cache!(conditions = {})
       before(:_cache_before, conditions.only(:if, :unless).merge(:with => conditions))
       after(:_cache_after, conditions.only(:if, :unless).merge(:with => conditions))
@@ -16,10 +22,27 @@ module Merb::Cache::Controller
     # valid options are:
     # :expire_in => 3600 (one hour)
     def cache_action(action, conditions = {})
+      self._cache[action] = conditions
       before("_cache_#{action}_before", conditions.only(:if, :unless).merge(:with => [conditions], :only => action))
       after("_cache_#{action}_after", conditions.only(:if, :unless).merge(:with => [conditions], :only => action))
       alias_method "_cache_#{action}_before", :_cache_before
       alias_method "_cache_#{action}_after",  :_cache_after
+    end
+  
+  
+    def caches?(action, params = {})
+      controller, conditions = _controller_and_conditions(action, params)
+      Merb::Cache[controller._lookup_store(conditions)].writable?(controller, *controller._parameters_and_conditions(conditions))
+    end
+  
+    def cache_for(action, params = {})
+      controller, conditions = _controller_and_conditions(action, params)
+      Merb::Cache[controller._lookup_store(conditions)].read(controller, *controller._parameters_and_conditions(conditions).first)      
+    end
+    
+    def delete_cache_for(action, params = {})
+      controller, conditions = _controller_and_conditions(action, params)
+      Merb::Cache[controller._lookup_store(conditions)].delete(controller, *controller._parameters_and_conditions(conditions).first)      
     end
   
     # Caches specified with eager_cache will be run after #trigger_action has been run
@@ -78,6 +101,16 @@ module Merb::Cache::Controller
 
     def build_url(*args)
       Merb::Router.url(*args)
+    end
+    
+    def _controller_and_conditions(action, params)
+      conditions = self._cache[action]
+      options = params.only(:uri, :method)
+      params.extract!(:uri, :method)
+      controller = new(build_request(params, options))
+      controller.action_name = action
+
+      [controller, conditions]
     end
   end
 end
