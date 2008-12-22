@@ -1,8 +1,18 @@
 module Merb::Cache::Controller
   module InstanceMethods
     # Partial / fragment caches are written / retrieved using fetch_partial
-    # Valid options are:
-    # :collection => @object
+    #
+    # @params template<String, Symbol> The path to the template, relative to the current controller or the template root
+    # @params opts<Hash> Options for the partial (@see Merb::RenderMixin#partial)
+    # @params conditions<Hash> conditions for the store (also accept :store for specifying the store)
+    #
+    # @note
+    #   The opts hash supports :params_for_cache which can be used to specify which parameters will be passed to the store.
+    #   If you call `fetch_partial` with parameters that are instance of model it will fail, so you need to use :params_for_cache in this case
+    #
+    # @example fetch_partial :bar
+    # @example fetch_partial :foo, :with => @foo, :params_for_cache => {:foo => @foo.id}
+    # @example fetch_partial :store, :with => @items, :params_for_cache => {:store_version => @store.version, :store_id => @store.id} 
     def fetch_partial(template, opts={}, conditions = {})
       template_id = template.to_s
       if template_id =~ %r{^/}
@@ -21,8 +31,18 @@ module Merb::Cache::Controller
       concat(Merb::Cache[_lookup_store(conditions)].fetch(template_key, params_for_cache, conditions, &fetch_proc), fetch_proc.binding)
     end
 
+
+
+    # Used to cache the result of a long running block
+    #
+    # @params opts<Hash> options (only uses :cache_key to define the key used)
+    # @params conditions<Hash> conditions passed to the store (also accept :store for specifying the store)
+    # @params &proc<Block> block generating the result to cache
+    #
+    # @example fetch_fragment { #stuff to do}
+    #
+    # @api public
     def fetch_fragment(opts = {}, conditions = {}, &proc)
-    
       if opts[:cache_key].blank?
         file, line = proc.to_s.scan(%r{^#<Proc:0x\w+@(.+):(\d+)>$}).first
         fragment_key = "#{file}[#{line}]"
@@ -65,6 +85,26 @@ module Merb::Cache::Controller
       end
     end
 
+    # After the request has finished, cache the action without holding some poor user up generating the cache (through run_later)
+    # 
+    # @param action<Array[Controller,Symbol], Symbol> the target option to cache (if no controller is given, the current controller is used)
+    # @param conditions<Hash> conditions passed to the store. See note for conditions specific to eager_cache
+    # @param params<Hash> params passed to the block
+    # @param env<Hash>  request environment variables
+    # @param blk<Block> Block run to generate the request or controller used for eager caching after trigger_action has run
+    #
+    # @note
+    #   There are a number of options specific to eager_cache in the conditions hash
+    #     - :uri the uri of the resource you want to eager cache (needed by the page store but can be provided instead by a block)
+    #     - :method http method used (defaults to :get)
+    #     - :store which store to use
+    #     - :params list of params to pass to the store when writing to it
+    #
+    # @example eager_cache :update, :index, :uri => '/articles' # When the update action is completed, a get request to :index with '/articles' uri will be cached (if you use the page store, this will be stored in '/articles.html')
+    # @example eager_cache :create, :index # Same after the create action but since no uri is given, the current uri is used with the default http method (:get). Useful default for resource controllers
+    # @example eager_cache(:create, [Timeline, :index]) {{ :uri => build_url(:timelines)}} 
+    #
+    # @api public
     def eager_cache(action, conditions = {}, params = request.params.dup, env = request.env.dup, &blk)
       unless @_skip_cache
         if action.is_a?(Array)
