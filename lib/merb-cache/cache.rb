@@ -40,6 +40,7 @@ module Merb
     # name<Symbol> : The name of a registered store
     # Returns<Nil AbstractStore> : A thread-safe copy of the store
     def self.[](*names)
+      names = names.first if names.first.is_a? Array
       if names.size == 1
         Thread.current[:'merb-cache'] ||= {}
         (Thread.current[:'merb-cache'][names.first] ||= stores[names.first].clone)
