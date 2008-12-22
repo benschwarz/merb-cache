@@ -126,13 +126,21 @@ describe Merb::Cache::PageStore do
         NhlScores.caches?(:overview, :uri => url(:overview)).should be_true
       end
       
-      it "should return true for a request to overview with the :post method" do
+      it "should return false for a request to overview with the :post method" do
         NhlScores.caches?(:overview, :uri => url(:overview), :method => :post).should be_false
       end
       
       it "should return false for a request to overview with query string parameters" do
         NhlScores.caches?(:overview, :uri => url(:overview, :foo => 'baz')).should be_false
       end  
+      
+      it "should return true for a request to overview with the :get method when looking in the page store" do
+        NhlScores.caches?(:overview, :uri => url(:overview), :store => :default).should be_true
+      end
+      
+      it "should return false for a request to overview with the :get method when looking in the action store" do
+        pending "need to move all the specs for caches? over to a controller integration test that uses both controller stores"
+      end      
     end
   end
 end

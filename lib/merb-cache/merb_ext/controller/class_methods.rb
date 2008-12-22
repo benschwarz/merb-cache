@@ -48,7 +48,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action to check
     # 
-    # @param params<Hash> params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request
+    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -69,7 +69,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action to check
     # 
-    # @param params<Hash> params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request
+    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -89,7 +89,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action to check
     # 
-    # @param params<Hash> params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request
+    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -109,7 +109,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action
     # 
-    # @param params<Hash> params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request
+    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -222,7 +222,7 @@ module Merb::Cache::Controller
     # @param params<Hash> params from the request.
     #
     # @note
-    #   in the params hash, :uri and :method are also supported to indicate the :uri and :method of the request
+    #   in the params hash, :uri and :method are also supported to indicate the :uri and :method of the request. Additionally :store and :stores specify which store to use. 
     #
     # @return <Array[Controller, Hash]>
     #   the controller built using the request corresponding to params
@@ -232,7 +232,8 @@ module Merb::Cache::Controller
     def _controller_and_conditions(action, params)
       conditions = self._cache[action]
       options = params.only(:uri, :method)
-      params.extract!(:uri, :method)
+      conditions.merge!(params.only(:store, :stores))
+      params.extract!(:uri, :method, :store, :stores)
       controller = new(build_request(params, options))
       controller.action_name = action
 
