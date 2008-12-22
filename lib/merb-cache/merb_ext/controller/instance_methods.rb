@@ -100,9 +100,9 @@ module Merb::Cache::Controller
     #     - :store which store to use
     #     - :params list of params to pass to the store when writing to it
     #
-    # @example eager_cache :update, :index, :uri => '/articles' # When the update action is completed, a get request to :index with '/articles' uri will be cached (if you use the page store, this will be stored in '/articles.html')
-    # @example eager_cache :create, :index # Same after the create action but since no uri is given, the current uri is used with the default http method (:get). Useful default for resource controllers
-    # @example eager_cache(:create, [Timeline, :index]) {{ :uri => build_url(:timelines)}} 
+    # @example eager_cache  :index, :uri => '/articles' # When the update action is completed, a get request to :index with '/articles' uri will be cached (if you use the page store, this will be stored in '/articles.html')
+    # @example eager_cache :index # Same after the create action but since no uri is given, the current uri is used with the default http method (:get). Useful default for resource controllers
+    # @example eager_cache([Timeline, :index]) {{ :uri => build_url(:timelines)}} 
     #
     # @api public
     def eager_cache(action, conditions = {}, params = request.params.dup, env = request.env.dup, &blk)
