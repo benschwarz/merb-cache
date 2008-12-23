@@ -126,7 +126,7 @@ module Merb::Cache::Controller
     # Caches specified with eager_cache will be run after #trigger_action has been run
     # without holding some poor user up generating the cache (through run_later)
     # 
-    # @param trigger_action<Symbol> The action that will trigger the eager caching
+    # @param trigger_action<Symbol, Array[*Symbol]> The actions that will trigger the eager caching
     # @param target<Array[Controller,Symbol], Symbol> the target option to cache (if no controller is given, the current controller is used)
     # @param conditions<Hash> conditions passed to the store. See note for conditions specific to eager_cache
     # @param blk<Block> Block run to generate the request or controller used for eager caching after trigger_action has run
@@ -143,17 +143,21 @@ module Merb::Cache::Controller
     # @example eager_cache(:create, [Timeline, :index]) {{ :uri => build_url(:timelines)}} 
     #
     # @api public
-    def eager_cache(trigger_action, target = trigger_action, conditions = {}, &blk)
-      target, conditions = trigger_action, target if target.is_a? Hash
+    def eager_cache(trigger_actions, target = nil, conditions = {}, &blk)
+      trigger_actions = [*trigger_actions]
+      target, conditions = nil, target if target.is_a? Hash
+  
+      trigger_actions.each do |trigger_action|
 
-      if target.is_a? Array
-        target_controller, target_action = *target
-      else
-        target_controller, target_action = self, target
+        if target.is_a? Array
+          target_controller, target_action = *target
+        else
+          target_controller, target_action = self, (target || trigger_action)
+        end
+
+        after("_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", conditions.only(:if, :unless).merge(:with => [target_controller, target_action, conditions, blk], :only => trigger_action))
+        alias_method "_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", :_eager_cache_after
       end
-
-      after("_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", conditions.only(:if, :unless).merge(:with => [target_controller, target_action, conditions, blk], :only => trigger_action))
-      alias_method "_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", :_eager_cache_after
     end
   
     # Dispatches eager caches to a worker process

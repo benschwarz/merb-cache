@@ -114,7 +114,7 @@ describe Merb::Cache::ActionStore do
       cache :ticker, :expire_in => 10
 
       eager_cache :index, [MLBSchedule, :index]
-      eager_cache :overview, :index
+      eager_cache [:overview, :show], :index
       eager_cache(:short, :params => :page) do |params, env|
         {:params => params.merge(:page => (params[:page].to_i + 1).to_s)}
       end
@@ -189,6 +189,12 @@ describe Merb::Cache::ActionStore do
 
     it "should eager cache :index after a request to :overview" do
       dispatch_to(MLBScores, :overview)
+
+      @dummy.data("MLBScores#index").should == "MLBScores index"
+    end
+    
+    it "should eager cache :index after a request to :show" do
+      dispatch_to(MLBScores, :show, :team => :redsox)
 
       @dummy.data("MLBScores#index").should == "MLBScores index"
     end
