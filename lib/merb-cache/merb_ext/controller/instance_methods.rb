@@ -72,14 +72,15 @@ module Merb::Cache::Controller
       end
     end
 
-    def _eager_cache_after(klass, action, conditions = {}, blk = nil)
+    def _eager_cache_after(klass, action, options = {}, blk = nil)
       unless @skip_cache
         run_later do
           env = request.env.dup
-          env.merge!(conditions.only(:method, :uri))
+          env.merge!(options.only(:method, :uri))
 
           controller = klass.eager_dispatch(action, request.params.dup, env, blk)
-
+          conditions = self.class._cache[action]
+          
           Merb::Cache[controller._lookup_store(conditions)].write(controller, nil, *controller._parameters_and_conditions(conditions))
         end
       end
@@ -96,7 +97,7 @@ module Merb::Cache::Controller
     #   There are a number of options specific to eager_cache in the conditions hash
     #     - :uri the uri of the resource you want to eager cache (needed by the page store but can be provided instead by a block)
     #     - :method http method used (defaults to :get)
-    #     - :params list of params to use when sending the request to cache
+    #     - :params hash of params to use when sending the request to cache
     #
     # @example eager_cache  :index, :uri => '/articles' # When the update action is completed, a get request to :index with '/articles' uri will be cached (if you use the page store, this will be stored in '/articles.html')
     # @example eager_cache :index # Same after the create action but since no uri is given, the current uri is used with the default http method (:get). Useful default for resource controllers

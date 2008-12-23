@@ -128,22 +128,20 @@ module Merb::Cache::Controller
     # 
     # @param trigger_action<Symbol, Array[*Symbol]> The actions that will trigger the eager caching
     # @param target<Array[Controller,Symbol], Symbol> the target option to cache (if no controller is given, the current controller is used)
-    # @param conditions<Hash> conditions passed to the store. See note for conditions specific to eager_cache
+    # @param opts<Hash>  Request options. See note for details.
     # @param blk<Block> Block run to generate the request or controller used for eager caching after trigger_action has run
     #
     # @note
-    #   There are a number of options specific to eager_cache in the conditions hash
+    #   Valid request options are:
     #     - :uri the uri of the resource you want to eager cache (needed by the page store but can be provided instead by a block)
     #     - :method http method used (defaults to :get)
-    #     - :store which store to use
-    #     - :params list of params to pass to the store when writing to it
     #
     # @example eager_cache :update, :index, :uri => '/articles' # When the update action is completed, a get request to :index with '/articles' uri will be cached (if you use the page store, this will be stored in '/articles.html')
     # @example eager_cache :create, :index # Same after the create action but since no uri is given, the current uri is used with the default http method (:get). Useful default for resource controllers
     # @example eager_cache(:create, [Timeline, :index]) {{ :uri => build_url(:timelines)}} 
     #
     # @api public
-    def eager_cache(trigger_actions, target = nil, conditions = {}, &blk)
+    def eager_cache(trigger_actions, target = nil, opts = {}, &blk)
       trigger_actions = [*trigger_actions]
       target, conditions = nil, target if target.is_a? Hash
   
@@ -155,7 +153,7 @@ module Merb::Cache::Controller
           target_controller, target_action = self, (target || trigger_action)
         end
 
-        after("_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", conditions.only(:if, :unless).merge(:with => [target_controller, target_action, conditions, blk], :only => trigger_action))
+        after("_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", opts.only(:if, :unless).merge(:with => [target_controller, target_action, opts, blk], :only => trigger_action))
         alias_method "_eager_cache_#{trigger_action}_to_#{target_controller.name.snake_case}__#{target_action}_after", :_eager_cache_after
       end
     end
