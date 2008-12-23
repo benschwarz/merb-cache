@@ -88,7 +88,7 @@ module Merb::Cache::Controller
     # After the request has finished, cache the action without holding some poor user up generating the cache (through run_later)
     # 
     # @param action<Array[Controller,Symbol], Symbol> the target option to cache (if no controller is given, the current controller is used)
-    # @param conditions<Hash> conditions passed to the store. See note for conditions specific to eager_cache
+    # @param options<Hash> Request options. See note for details
     # @param env<Hash>  request environment variables
     # @param blk<Block> Block run to generate the request or controller used for eager caching after trigger_action has run
     #
@@ -96,7 +96,6 @@ module Merb::Cache::Controller
     #   There are a number of options specific to eager_cache in the conditions hash
     #     - :uri the uri of the resource you want to eager cache (needed by the page store but can be provided instead by a block)
     #     - :method http method used (defaults to :get)
-    #     - :store which store to use
     #     - :params list of params to use when sending the request to cache
     #
     # @example eager_cache  :index, :uri => '/articles' # When the update action is completed, a get request to :index with '/articles' uri will be cached (if you use the page store, this will be stored in '/articles.html')
@@ -104,7 +103,7 @@ module Merb::Cache::Controller
     # @example eager_cache([Timeline, :index]) :uri => url(:timelines)}} 
     #
     # @api public
-    def eager_cache(action, conditions = {}, env = request.env.dup, &blk)
+    def eager_cache(action, options = {}, env = request.env.dup, &blk)
       unless @_skip_cache
         if action.is_a?(Array)
           klass, action = *action
@@ -114,7 +113,7 @@ module Merb::Cache::Controller
 
         run_later do
           env = request.env.dup
-          env.merge!(conditions.only(:method, :uri, :params))
+          env.merge!(options.only(:method, :uri, :params))
           controller = klass.eager_dispatch(action, {}, env, blk)
         end
       end
