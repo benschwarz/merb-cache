@@ -34,7 +34,7 @@ describe Merb::Cache::PageStore do
 
       eager_cache :index, :overview, :uri => '/overview'
       eager_cache :overview, :index
-      eager_cache(:overview, :show) {|params, env| build_request(build_url(:show, :team => 1), :team => 1) }
+      eager_cache(:overview, :show) {{ :uri => build_url(:show, :team => 1), :params => {:team => 1} }}
 
       def index
         "NHLScores index"

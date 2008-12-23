@@ -48,7 +48,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action to check
     # 
-    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
+    # @param request_hash<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -69,7 +69,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action to check
     # 
-    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
+    # @param request_hash<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -89,7 +89,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action to check
     # 
-    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
+    # @param request_hash<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -109,7 +109,7 @@ module Merb::Cache::Controller
     #
     # @param action<String> action
     # 
-    # @param params<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
+    # @param request_hash<Hash> The params that the request would have. :uri and :method are also supported to indicate the :uri and :method of the request. :store and :stores indicate the cache store to use.
     #
     # @note
     #   if not specified, the default http method is :get and the default uri is '/'
@@ -166,7 +166,7 @@ module Merb::Cache::Controller
     # @api private
     def eager_dispatch(action, params = {}, env = {}, blk = nil)
       kontroller = if blk.nil?
-        new(build_request({}, env))
+        new(build_request(env))
       else
         result = case blk.arity
           when 0  then  blk[]
@@ -175,8 +175,8 @@ module Merb::Cache::Controller
         end
 
         case result
-        when NilClass         then new(build_request({}, env))
-        when Hash, Mash       then new(build_request({}, result))
+        when NilClass         then new(build_request(env))
+        when Hash, Mash       then new(build_request(result))
         when Merb::Request    then new(result)
         when Merb::Controller then result
         else raise ArgumentError, "Block to eager_cache must return nil, the env Hash, a Request object, or a Controller object"
@@ -193,22 +193,22 @@ module Merb::Cache::Controller
     # Builds a request that will be sent to the merb worker process to be
     # cached without holding some poor user up generating the cache (through run_later)
     #
-    # @param uri<String> the uri of the request (can also be given as :uri in env hash)
-    # @param params<Hash> params of the request
-    # @param env<Hash> environment variables of the request (also accepts :uri and :method)
+    # @param request_hash<Hash> hash used to describe the request
+    #
+    # @note Acceptable options for the request hash
+    #   - :uri The uri of the request
+    #   - :method The http method (defaults to :get)
+    #   - :params The params
+    #   - any env variable you may need
     #
     # @return <Request>
     #   A request for the given arguments
     #
-    # @example build_request(build_url(:article, @article), :id => @article.id, :method => :put) # a request corresponding to the update action of a resourceful controller
-    # @example build_request({:id => @article.id}, :method => :put, :uri => build_url(:article, @article)}) #same as above but different way of calling it
+    # @example build_request(:params => {:id => @article.id}, :method => :put, :uri => build_url(:article, @article)}) # a request corresponding to the update action of a resourceful controller
     #
     # @api public
-    def build_request(uri, params = {}, env = {})
-      uri, params, env = nil, uri, params if uri.is_a? Hash
-      uri ||= env.delete(:uri)
-
-      Merb::Cache::CacheRequest.new(uri, params, env)
+    def build_request(request_hash = {})
+      Merb::Cache::CacheRequest.new(request_hash.delete(:uri), request_hash.delete(:params), request_hash)
     end
 
     # @see Router.url
@@ -219,22 +219,21 @@ module Merb::Cache::Controller
     # Used by cache?, cached?, cache_for and delete_cache_for to generate the controller from the given parameters.
     #
     # @param action<String> the cached action
-    # @param params<Hash> params from the request.
+    # @param request_hash<Hash> params from the request.
     #
     # @note
-    #   in the params hash, :uri and :method are also supported to indicate the :uri and :method of the request. Additionally :store and :stores specify which store to use. 
+    #   in the request hash, :params, :uri and :method are supported. Additionally :store and :stores specify which store to use. 
     #
     # @return <Array[Controller, Hash]>
     #   the controller built using the request corresponding to params
     #   the conditions for the cached action
     #
     # @api private
-    def _controller_and_conditions(action, params)
+    def _controller_and_conditions(action, request_hash)
       conditions = self._cache[action]
-      options = params.only(:uri, :method)
-      conditions.merge!(params.only(:store, :stores))
-      params.extract!(:uri, :method, :store, :stores)
-      controller = new(build_request(params, options))
+      conditions.merge!(request_hash.only(:store, :stores))
+      request_hash.extract!(:store, :stores)
+      controller = new(build_request(request_hash))
       controller.action_name = action
 
       [controller, conditions]

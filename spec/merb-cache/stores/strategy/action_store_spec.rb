@@ -116,7 +116,7 @@ describe Merb::Cache::ActionStore do
       eager_cache :index, [MLBSchedule, :index]
       eager_cache :overview, :index
       eager_cache(:short, :params => :page) do |params, env|
-        build_request(params.merge(:page => (params[:page].to_i + 1).to_s))
+        {:params => params.merge(:page => (params[:page].to_i + 1).to_s)}
       end
 
       def index

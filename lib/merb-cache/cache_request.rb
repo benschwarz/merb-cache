@@ -19,7 +19,7 @@ module Merb
         super(DEFAULT_ENV.merge(env))
         
        
-        @params = params
+        @params = params || {}
       end
 
       DEFAULT_ENV = Mash.new({
