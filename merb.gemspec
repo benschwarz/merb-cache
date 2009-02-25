@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README", "LICENSE"]
   s.summary = PROJECT_SUMMARY
   s.description = PROJECT_DESCRIPTION
-  s.authors = ["Ben Burkert", "Ben Schwarz", "Daniel Neighman"]
+  s.authors = ["Ben Burkert", "Ben Schwarz", "Daniel Neighman", "Guillaume Maury"]
   s.add_dependency('merb-core', ">= 1.0")
   s.require_path = 'lib'
   s.files = %w(LICENSE README Rakefile lib/merb-cache
